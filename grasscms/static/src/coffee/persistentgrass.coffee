@@ -15,7 +15,6 @@ class PersistentGrass
   init: ->
     @do_resizable()
     @assign_events()
-    $('#current_element_name').html("GrassCMS")
 
   assign_events: ->
     @element.on 'clear', @clear_all
@@ -29,7 +28,7 @@ class PersistentGrass
     @element.on 'contextmenu', @contextmenu
 
   element_clicked: (ev) ->
-    first_children_id = $($(this).children[0]).attr('id')
+    first_children_id = ($ ev.target) .attr 'id'
     $('#panel_left')[0].dataset['current_element'] = first_children_id
 
     if getCurrentElement().css('opacity')
