@@ -11,10 +11,10 @@ class Ruler
     ($ @element) .on 'dragend', @dragend
 
   dragstart: (ev) ->
-    if this.dataset['clone'] != true
-       this.dataset['clone'] = true
+    if this.dataset['clone'] != "true"
+       this.dataset['clone'] = "true"
        el = ($ this) .clone().appendTo('body')
-       el[0].dataset['clone'] = false
+       el[0].dataset['clone'] = "false"
        ($ el) .css 'z-index', 0
        ($ this) .css 'z-index', 1
        ($ el).Ruler(this.dataset['movement'])
