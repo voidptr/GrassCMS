@@ -113,11 +113,12 @@ def page(blog_name=False, page_="index", subpage=0, main_url=False):
 
     if title == "index":
         title = blog.name
+    paid_user = blog.paid_this_month
 
     if not g.user_is_admin:
         return render_template( 'index.html', main_url=main_url, page=page,
-            blog=user_blog, paid_user=paid_user, static_htmls=static_htmls,
-            description=blog.description, title=title)
+            blog=user_blog, static_htmls=static_htmls,
+            description=blog.description, title=title, paid_user = paid_user)
     else:
         return render_template( 'admin.html', main_url=main_url, page=page,
             blog=user_blog, static_htmls=static_htmls, title=title,
@@ -187,3 +188,17 @@ def object_manager(type_, subdomain=False):
         except Exception, error:
             app.logger.info(error)
             return "False"
+
+@app.route('/set/<what>/<id_>/<result>', methods=['GET', 'POST'], subdomain="<subdomain>")
+def set(what, id_, result, subdomain=False):
+    element = get_element_by_id(id_)
+    if result == "in_post":
+        result="<div class='handler'></div>\
+           <textarea class='alsoResizable'>%s</textarea>" %(request.form['result'])
+    try:
+        setattr(element, what, result)
+        db_session.commit()
+        return json.dumps(getattr(element, what))
+    except Exception, error:
+        app.logger.info(error)
+        return "False"
