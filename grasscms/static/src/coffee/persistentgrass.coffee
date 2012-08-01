@@ -18,8 +18,8 @@ class PersistentGrass
 
   assign_events: ->
     @element.on 'clear', @clear_all
-    @element.on 'mouseenter', @mouseenter
-    @element.on 'mouseleave', @mouseleave
+    @element.on 'mouseover', @mouseover
+    @element.on 'mouseout', @mouseout
     @element.on 'dragstart', @dragstart
     @element.on 'drag', @drag
     @element.on 'dragend', @dragend
@@ -29,28 +29,34 @@ class PersistentGrass
 
   element_clicked: (ev) ->
     first_children_id = ($ ev.target) .attr 'id'
+    if not first_children_id and ($ ($ ev.target) .children()[0] ) .attr 'id'
+      first_children_id = ($ ($ ev.target) .children[0]) .attr 'id'
+    if not first_children_id
+     return
+
     $('#panel_left')[0].dataset['current_element'] = first_children_id
 
     if getCurrentElement().css('opacity')
       $('#opacitypicker').val getCurrentElement().css('opacity')
     else
       $('#opacitypicker').val 1
+
     if $(this).children('img').attr('src')
       source = $(this).children('img').attr('src').split('/')
       text = source[source.length - 1]
     else if $(this).children('div')
       text = "Text element"
+    $('#current_element_name').html(text)
 
     if ev.shiftKey
       $($(this).children[0]).attr('contentEditable', 'true')
-    $('#current_element_name').html(text)
 
   clear_all: ->
     ($ '#panel_left') .dataset['current_element'] = false
     ($ '#current_element_name') .html("GrassCMS")
 
-  mouseenter: ->
-    this.style.border = '1px dotted grey'
+  mouseover: ->
+    ($ this).toggleClass('selectedObject')
 
   contextmenu: (ev) ->
       ($ '#menu')[0] .dataset['currentTarget'] = $(ev.target).attr('id')
@@ -59,15 +65,22 @@ class PersistentGrass
       ($ '#menu') .show()
       return false
 
-  mouseleave: ->
-    $($(this).children()[0]).attr('contentEditable', 'false')
-    this.style.border = '0px'
-    if $(this).css('height') != $(this).data('height')
-      $(this).trigger 'changed', 'height', this.style.height
-      $(this).dataset['height'] = $(this).css('height')
-    if $(this).css('width') != $(this).data('width')
-      $(this).trigger 'changed', 'width', this.style.width
-      $(this).dataset['width'] = $(this).css('width')
+  mouseout: ->
+    ($ this).toggleClass('selectedObject')
+
+    if ($ this) .attr 'id'
+      elem = ($ this)
+    else
+      return if not ($ ($ this) .children[0]).attr('id')
+      elem= ($ ($ this).children[0])
+
+    #$($(this).children()[0]).attr('contentEditable', 'false')
+    if elem .css('height') != elem[0].dataset('height')
+      elem .trigger 'changed', 'height', this.style.height
+      elem.dataset['height'] = elem .css('height')
+    if elem.css('width') != elem[0].dataset['width']
+      elem.trigger 'changed', 'width', this.style.width
+      elem.dataset['width'] = elem.css('width')
 
   do_resizable: ->
     @element = @element.wrap('<div class="resizable">').parent()
@@ -77,7 +90,6 @@ class PersistentGrass
   dragstart: (ev) ->
     $(this).trigger 'click'
     this.dataset['opacity'] = this.style.opacity
-    this.style.border = '1px dotted grey'
     this.style.opacity = 0.4
 
   drag: (ev) ->

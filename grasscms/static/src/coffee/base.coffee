@@ -17,12 +17,12 @@ setCss = (param, value, element, parent)  ->
 getFromMenu = (element) ->
   return $(element).parent().parent()[0].dataset['currentTarget']
 
-delete_ = (element, element2) ->
+delete_ = (element, parent=False) ->
   $(element).trigger 'changed', 'delete'
   $(element).trigger 'clear'
-  $(element).remove()
-  if element2
-    $(element2).remove()
+  if parent
+    $('#' + element).parent().remove()
+  $('#' + element).remove()
 
 getCurrentElement = () ->
   return $('#' + $('#panel_left')[0].dataset['current_element'])
