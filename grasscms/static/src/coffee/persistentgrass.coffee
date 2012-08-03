@@ -4,9 +4,6 @@
 #  License: GPL 2+
 
 class PersistentGrass
-  ###
-   @classDescription Persistence plugin for grasscms.
-  ###
   constructor: (@element_, options) ->
     @options = $.extend {}, options
     @element = $ @element_
@@ -16,47 +13,60 @@ class PersistentGrass
     @do_resizable()
     @assign_events()
 
-  assign_events: ->
-    @element.on 'clear', @clear_all
-    @element.on 'mouseover', @mouseover
-    @element.on 'mouseout', @mouseout
-    @element.on 'dragstart', @dragstart
-    @element.on 'drag', @drag
-    @element.on 'dragend', @dragend
-    @element.on 'click', @element_clicked
-    @element.on 'changed', @changed
-    @element.on 'contextmenu', @contextmenu
+  do_resizable: ->
+    @element.data  "width",  @element.css('width')
+    @element.data  "height",  @element.css('height')
+    @element = (($ @element_) .wrap '<div class="resizable" data-offset="' + @options.offset +  '">').parent()
 
-  element_clicked: (ev) ->
-    first_children_id = ($ ev.target) .attr 'id'
-    if not first_children_id and ($ ($ ev.target) .children()[0] ) .attr 'id'
-      first_children_id = ($ ($ ev.target) .children[0]) .attr 'id'
-    if not first_children_id
+  assign_events: ->
+    @element.on opt, this[opt] for opt in ['clear', 'mouseover', 'drag',
+      'mouseout', 'dblclick', 'contextmenu', 'dragstart',
+      'dragend', 'click', 'changed']
+
+  click: (ev) ->
+    target = ($ ev.target)
+    target_child = ($ ev.target) .children()[0]
+    id = ($ target) .attr 'id'
+    if not id  and ($ target_child) .attr 'id'
+      id = ($ target_child) .attr 'id'
+    if not id
      return
 
-    $('#panel_left')[0].dataset['current_element'] = first_children_id
+    $('#panel_left')[0].dataset['current_element'] = id
 
     if getCurrentElement().css('opacity')
       $('#opacitypicker').val getCurrentElement().css('opacity')
     else
       $('#opacitypicker').val 1
 
-    if $(this).children('img').attr('src')
-      source = $(this).children('img').attr('src').split('/')
+    img = ($ target) .children 'img'
+    div = ($ target) .children 'div'
+
+
+    if img[0]
+      source = ((($ target) .children 'img') .attr 'src') .split('/')
       text = source[source.length - 1]
-    else if $(this).children('div')
+    else if div[0]
       text = "Text element"
-    $('#current_element_name').html(text)
 
-    if ev.shiftKey
-      $($(this).children[0]).attr('contentEditable', 'true')
+    ($ '#current_element_name') .html text
 
-  clear_all: ->
+  dblclick: (ev) ->
+    target = ($ ev.target)
+    return if not target .hasClass 'textGrassy'
+    target .attr 'contentEditable', 'true'
+    target .attr 'draggable', 'false'
+    target .addClass 'editor_active'
+    ($ '#toggle_editing_active') .show()
+    ($ '#toggle_editing') .hide()
+
+  clear: ->
     ($ '#panel_left') .dataset['current_element'] = false
     ($ '#current_element_name') .html("GrassCMS")
 
   mouseover: ->
     ($ this).toggleClass('selectedObject')
+
 
   contextmenu: (ev) ->
       ($ '#menu')[0] .dataset['currentTarget'] = $(ev.target).attr('id')
@@ -74,29 +84,23 @@ class PersistentGrass
       return if not ($ ($ this) .children[0]).attr('id')
       elem= ($ ($ this).children[0])
 
-    #$($(this).children()[0]).attr('contentEditable', 'false')
-    if elem .css('height') != elem[0].dataset('height')
+    if elem .css 'height' != elem.data 'height'
       elem .trigger 'changed', 'height', this.style.height
-      elem.dataset['height'] = elem .css('height')
-    if elem.css('width') != elem[0].dataset['width']
-      elem.trigger 'changed', 'width', this.style.width
-      elem.dataset['width'] = elem.css('width')
+      elem .data 'height', elem .css 'height'
 
-  do_resizable: ->
-    @element = @element.wrap('<div class="resizable">').parent()
-    @element[0].dataset["width"] = @element.css('width')
-    @element[0].dataset["height"] = @element.css('height')
+    if elem.css 'width' != elem[0].dataset['width']
+      elem.trigger 'changed', 'width', this.style.width
+      elem.data 'width', elem.css 'width'
 
   dragstart: (ev) ->
     $(this).trigger 'click'
-    this.dataset['opacity'] = this.style.opacity
+    this.dataset['opacity'] = if this.style.opacity then this.style.opacity else 1
     this.style.opacity = 0.4
 
   drag: (ev) ->
-    $(this).attr 'draggable', 'true'
-    this.style.opacity = if $(this).data['opacity'] > 0 then $(this).dataset['opacity'] else 1
-    if ev.x > 250
-      this.style.left=ev.x - 250  + "px"
+    this.style.opacity = if this.dataset['opacity'] > 0 then this.dataset['opacity'] else 1
+    if ev.x > this.dataset['offset']
+      this.style.left=ev.x - this.dataset['offset']  + "px"
     this.style.top=ev.y + "px"
     this.style.position = "absolute"
 

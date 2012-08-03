@@ -1,4 +1,30 @@
 # Functions that might be used outside the plugin
+stoppropagation = (evt) ->
+  evt.stopPropagation()
+  evt.preventDefault()
+
+recover_mobility = () ->
+  element = getCurrentElement()
+  ($ element) .attr 'draggable', true
+  ($ element) .removeClass 'editor_active'
+
+execcmd= (ev) ->
+ document.execCommand(($ ev.target).parent().data('tag'), false)
+
+drop = (ev) ->
+  files = ev.dataTransfer.files
+  reader = new FileReader()
+  console.log(files[0])
+  console.log(reader)
+  reader.onload = (evt) ->
+    # TODO: This has to be uploaded to the server, get the cb, and put the cb.
+    img = ($ '<img>')
+    img .attr 'src', evt.target.result
+    img .addClass 'persistentGrassy'
+    ($ 'body') .append img
+    ($ img) .PersistentGrass()
+  reader.readAsDataURL(files[0])
+  stoppropagation(ev)
 
 setCss = (param, value, element, parent)  ->
   element = $('#' + element) # We're getting element as an id
@@ -31,4 +57,7 @@ getCurrentElement = () ->
 window.getCurrentElement = getCurrentElement
 window.delete_ = delete_
 window.setCss=setCss
+window.recover_mobility = recover_mobility
 window.getFromMenu = getFromMenu
+window.drop = drop
+window.execcmd = execcmd

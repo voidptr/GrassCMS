@@ -1,5 +1,6 @@
 # Contextual menu and other stuff that have to be done outside too, or not.
 
+
 ($ document).ready ->
   ($ document).on 'click', (ev) ->
     if ev.button == 0 and ev.target.parentNode.id != "#menu"
@@ -14,7 +15,12 @@
       getCurrentElement().css 'background', $('#colorpicker').val()
     else
       $('body').css 'background', $('#colorpicker').val()
+  ($ button).on 'click', execcmd for button in $('button[data-tag]')
 
+  ($ '#filediv').on 'drop', drop
+  ($ '#filediv').on 'dragenter', stoppropagation
+  ($ '#filediv').on 'dragover', stoppropagation
+  ($ '#filediv').on 'dragexit', stoppropagation
   ($ '.persistentGrassy') .PersistentGrass()
   ($ '.rect-x') .Ruler('x')
   ($ '.rect-y') .Ruler('y')
