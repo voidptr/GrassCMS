@@ -12,15 +12,18 @@ class PersistentGrass
   init: ->
     @do_resizable()
     @assign_events()
+    ($ '.textGrassy').on 'DOMNodeInserted DOMSubtreeModified DOMNodeRemoved', @changed
 
   do_resizable: ->
-    @element.data  "width",  @element.css('width')
-    @element.data  "height",  @element.css('height')
-    @element = (($ @element_) .wrap '<div class="resizable" data-offset="' + @options.offset +  '">').parent()
+    width = if @element.css('width') != "0px" then @element.css('width') else "100px"
+    height = if @element.css('height') != "0px" then @element.css('height') else "100px"
+    @element.css 'width', "100%"
+    @element.css 'height', "100%"
+    @element = (($ @element_ ) .wrap '<div style="width:' + width + '; height:' + height + '" class="resizable" data-offset="' + @options.offset +  '">').parent()
 
   assign_events: ->
     $('.control_div') .on 'click', @clear
-    @element.on opt, this[opt] for opt in ['clear', 'mouseover', 'drag',
+    @element.on opt, this[opt] for opt in ['update_toolbar', 'clear', 'mouseover', 'drag',
       'mouseout', 'dblclick', 'contextmenu', 'dragstart',
       'dragend', 'click', 'changed']
 
@@ -29,7 +32,8 @@ class PersistentGrass
     target = ($ ev.target)
     target_child = ($ ev.target) .children()[0]
     id = ($ target) .attr 'id'
-    console.log ($ target)
+    target .trigger 'update_toolbar', ev
+
     if not id  and ($ target_child) .attr 'id'
       id = ($ target_child) .attr 'id'
     if not id
@@ -71,7 +75,8 @@ class PersistentGrass
     ($ '#editor') .show()
     ($ '#toggle_editing') .hide()
 
-  clear: ->
+  clear: (ev) ->
+    # TODO This should not be fired if the target is the textbox itself on texts... =(
     ($ '.simpleHtml5Editor') .hide()
     recover_mobility()
     ($ '#toggle_editing') .show()
@@ -98,16 +103,25 @@ class PersistentGrass
     if ($ this) .attr 'id'
       elem = ($ this)
     else
-      return if not ($ ($ this) .children[0]).attr('id')
-      elem= ($ ($ this).children[0])
+      return if not ($ ($ this) .children()[0]).attr('id')
+      elem= ($ ($ this).children()[0])
 
     if elem .css 'height' != elem.data 'height'
-      elem .trigger 'changed', 'height', this.style.height
+      elem .trigger 'changed', ['height', this.style.height]
       elem .data 'height', elem .css 'height'
 
     if elem.css 'width' != elem[0].dataset['width']
-      elem.trigger 'changed', 'width', this.style.width
+      elem.trigger 'changed', ['width', this.style.width]
       elem.data 'width', elem.css 'width'
+
+  update_toolbar: (ev) ->
+    target = ($ ev.target)
+    if ($ ev.target) .hasClass 'persistentGrassy'
+      target = ($ ev.target).parent()
+    ($ '#width') .val ((target .css 'width') .split ('px'))[0]
+    ($ '#height') .val ((target .css 'height') .split ('px'))[0]
+    ($ '#y') .val ((target .css 'top') .split ('px'))[0]
+    ($ '#x') .val ((target .css 'left') .split ('px'))[0]
 
   dragstart: (ev) ->
     $(this).trigger 'click'
@@ -115,6 +129,7 @@ class PersistentGrass
     this.style.opacity = 0.4
 
   drag: (ev) ->
+    $(ev.target) .trigger 'update_toolbar'
     this.style.opacity = if this.dataset['opacity'] > 0 then this.dataset['opacity'] else 1
     if ev.x > this.dataset['offset']
       this.style.left=ev.x - this.dataset['offset']  + "px"
@@ -124,12 +139,17 @@ class PersistentGrass
 
   dragend: (ev) ->
     this.style.opacity = if this.dataset['opacity'] > 0 then this.dataset['opacity'] else 1
-    $(this).trigger 'changed', 'top', ev.y
-    $(this).trigger 'changed', 'left', ev.x
+    $(this).trigger 'changed', ['top', ev.y]
+    $(this).trigger 'changed', ['left', ev.x]
 
-  changed: (attr, result) ->
-    return # TODO
-    id = $(this).attr('id')
+  changed: (ev, attr, result) ->
+    if not ev.target.css
+      target = ($ ev.target).parent()
+    else
+      target = ($ ev.target)
+    target .trigger 'update_toolbar'
+
+    id = target.attr('id')
     $.ajax '/object/',
       type: 'PUT',
       dataType: 'json',
@@ -141,4 +161,4 @@ class PersistentGrass
 
 do ($) ->
   $.fn.PersistentGrass = (options = offset:250) ->
-    grasspersistence = new PersistentGrass(@, options)
+    grasspersistence = ( new PersistentGrass(elem, options) for elem in @)
