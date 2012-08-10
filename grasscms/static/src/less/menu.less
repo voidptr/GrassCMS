@@ -1,3 +1,4 @@
+.show_on_element{ display:none; }
 #menu{
 	list-style:none;
 	line-height:23px;
@@ -8,6 +9,8 @@
 	background:lighten(@standard_bg, 20%);
 	z-index:90000;
 }
+
+#editor{ display:none; }
 
 #menu li{
     line-height: 1.5em;  
@@ -20,8 +23,33 @@
 	text-align:center;
 }
 
+.nav a{
+color:black;
+text-decoration: none;
+}
+
+.show_on_element .controls{
+	margin-left:50px!important;
+}
+.show_on_element .control-label{
+	width:42px!important;
+}
+
+#current_element_name_{
+	text-align:center;
+}
+
+
+.cen_section{
+	width:100%;
+	margin-top:-10px; margin-left:-10px; width:250px;
+	background:darken(@color, 20%);
+	padding-bottom:10px; padding-top:10px;
+}
+
 #panel_left{
-	width:@panel_width;
+	width:@panel_width - 20;
+	padding:10px;
 	position:fixed;
 	left:0px; top:0px;
 	height:100%;
@@ -31,7 +59,7 @@
 }
 
 .panel_section{
-	border-bottom:1px solid lighten(@standard_bg, 10%)
+	margin-bottom: 10px; 
 }
 
 .rect-y{ 

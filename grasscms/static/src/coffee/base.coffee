@@ -8,9 +8,6 @@ recover_mobility = () ->
   ($ element) .attr 'draggable', true
   ($ element) .removeClass 'editor_active'
 
-execcmd= (ev) ->
- document.execCommand(($ ev.target).parent().data('tag'), false)
-
 drop = (ev) ->
   files = ev.dataTransfer.files
   reader = new FileReader()
@@ -53,11 +50,16 @@ delete_ = (element, parent=False) ->
 getCurrentElement = () ->
   return $('#' + $('#panel_left')[0].dataset['current_element'])
 
+stoppropagation = (ev) ->
+    ev.preventDefault()
+    ev.stopPropagation()
+
 # Exports
+window.stopPropagation = stoppropagation
 window.getCurrentElement = getCurrentElement
 window.delete_ = delete_
 window.setCss=setCss
 window.recover_mobility = recover_mobility
 window.getFromMenu = getFromMenu
 window.drop = drop
-window.execcmd = execcmd
+
