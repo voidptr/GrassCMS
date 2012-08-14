@@ -4,6 +4,7 @@
   setup_menu(document)
   setup_toolbar('body')
   assign_toolbar_events()
+  ($ document).on 'dragover', dragover
   $('#page_editor').children(":not(.no-drag)").Sortable()
   ($ '#editor') .simpleHtml5Editor()
   ($ '.persistentGrassy') .PersistentGrass()

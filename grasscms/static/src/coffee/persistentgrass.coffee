@@ -3,6 +3,11 @@
 #  Author: David Francos Cuartero <david@theothernet.co.uk>
 #  License: GPL 2+
 
+dragover = (ev) ->
+  window.current_x = ev.pageX
+  window.current_y = ev.pageY
+window.dragover = dragover
+
 class PersistentGrass
   constructor: (@element_, options) ->
     @options = $.extend {}, options
@@ -19,7 +24,7 @@ class PersistentGrass
     height = if @element.css('height') != "0px" then @element.css('height') else "100px"
     @element.css 'width', "100%"
     @element.css 'height', "100%"
-    @element = (($ @element_ ) .wrap '<div style="position:absolute; width:' + width + '; height:' + height + '" class="resizable" data-offset="' + @options.offset +  '">').parent()
+    @element = (($ @element_ ) .wrap '<div draggable=true style="position:absolute; width:' + width + '; height:' + height + '" class="resizable" data-offset="' + @options.offset +  '">').parent()
 
   assign_events: ->
     $('.control_div') .on 'click', @clear
@@ -129,8 +134,11 @@ class PersistentGrass
     if ev.x > this.dataset['offset']
       this.style.left=ev.x - this.dataset['offset']  + "px"
     this.style.top=ev.y + "px"
-
+    if not ev.y and not ev.x
+      this.style.left = window.current_x - this.dataset['offset'] + "px"
+      this.style.top = window.current_y + "px"
     stopPropagation(ev)
+
 
   dragend: (ev) ->
     this.style.opacity = if this.dataset['opacity'] > 0 then this.dataset['opacity'] else 1
