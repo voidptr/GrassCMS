@@ -8,21 +8,6 @@ recover_mobility = () ->
   ($ element) .attr 'draggable', true
   ($ element) .removeClass 'editor_active'
 
-drop = (ev) ->
-  files = ev.dataTransfer.files
-  reader = new FileReader()
-  console.log(files[0])
-  console.log(reader)
-  reader.onload = (evt) ->
-    # TODO: This has to be uploaded to the server, get the cb, and put the cb.
-    img = ($ '<img>')
-    img .attr 'src', evt.target.result
-    img .addClass 'persistentGrassy'
-    ($ 'body') .append img
-    ($ img) .PersistentGrass()
-  reader.readAsDataURL(files[0])
-  stoppropagation(ev)
-
 setCss = (param, value, element, parent)  ->
   element = $('#' + element) # We're getting element as an id
   curr_value = (Number) ($ element) .css param

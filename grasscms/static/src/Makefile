@@ -8,7 +8,7 @@ compress: build
 
 build_:
 	mkdir -p build/js build/css &>/dev/null
-	coffee --join build/js/grasscms.js --compile coffee/*.coffee
+	coffee --join build/js/grasscms.js --compile coffee/*/*.coffee coffee/*.coffee
 	lessc less/main.less build/css/grasscms.css
 	cp -r vendor/editor/less/font-awesome/font/ build/
 

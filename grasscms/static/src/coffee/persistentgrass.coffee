@@ -23,7 +23,7 @@ class PersistentGrass
 
   assign_events: ->
     $('.control_div') .on 'click', @clear
-    @element.on opt, this[opt] for opt in ['update_toolbar', 'clear', 'mouseover', 'drag',
+    @element.on opt, this[opt] for opt in ['toolbar_updated', 'clear', 'mouseover', 'drag',
       'mouseout', 'dblclick', 'contextmenu', 'dragstart',
       'dragend', 'click', 'changed']
 
@@ -32,7 +32,7 @@ class PersistentGrass
     target = ($ ev.target)
     target_child = ($ ev.target) .children()[0]
     id = ($ target) .attr 'id'
-    target .trigger 'update_toolbar', ev
+    target .trigger 'toolbar_updated', ev
 
     if not id  and ($ target_child) .attr 'id'
       id = ($ target_child) .attr 'id'
@@ -90,11 +90,7 @@ class PersistentGrass
     ($ this).toggleClass('selectedObject')
 
   contextmenu: (ev) ->
-      ($ '#menu')[0] .dataset['currentTarget'] = $(ev.target).attr('id')
-      ($ '#menu') .css 'top', ev.y - 35
-      ($ '#menu') .css 'left', ev.x - 30
-      ($ '#menu') .show()
-      return false
+    contextual_menu(($ ev.target), [ev.x, ev.y ])
 
   mouseout: (ev) ->
     stopPropagation(ev)
@@ -114,22 +110,20 @@ class PersistentGrass
       elem.trigger 'changed', ['width', this.style.width]
       elem.data 'width', elem.css 'width'
 
-  update_toolbar: (ev) ->
+  toolbar_updated: (ev) ->
     target = ($ ev.target)
     if ($ ev.target) .hasClass 'persistentGrassy'
       target = ($ ev.target).parent()
-    ($ '#width') .val ((target .css 'width') .split ('px'))[0]
-    ($ '#height') .val ((target .css 'height') .split ('px'))[0]
-    ($ '#y') .val ((target .css 'top') .split ('px'))[0]
-    ($ '#x') .val ((target .css 'left') .split ('px'))[0]
+    update_toolbar(target)
 
   dragstart: (ev) ->
+    ev.dataTransfer.setData 'Text', this.id
     $(this).trigger 'click'
     this.dataset['opacity'] = if this.style.opacity then this.style.opacity else 1
     this.style.opacity = 0.4
 
   drag: (ev) ->
-    $(ev.target) .trigger 'update_toolbar'
+    $(ev.target) .trigger 'toolbar_updated'
     this.style.opacity = if this.dataset['opacity'] > 0 then this.dataset['opacity'] else 1
     if ev.x > this.dataset['offset']
       this.style.left=ev.x - this.dataset['offset']  + "px"
@@ -147,7 +141,7 @@ class PersistentGrass
       target = ($ ev.target).parent()
     else
       target = ($ ev.target)
-    target .trigger 'update_toolbar'
+    target .trigger 'toolbar_updated'
 
     id = target.attr('id')
     $.ajax '/object/',
