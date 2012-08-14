@@ -19,7 +19,7 @@ class PersistentGrass
     height = if @element.css('height') != "0px" then @element.css('height') else "100px"
     @element.css 'width', "100%"
     @element.css 'height', "100%"
-    @element = (($ @element_ ) .wrap '<div style="width:' + width + '; height:' + height + '" class="resizable" data-offset="' + @options.offset +  '">').parent()
+    @element = (($ @element_ ) .wrap '<div style="position:absolute; width:' + width + '; height:' + height + '" class="resizable" data-offset="' + @options.offset +  '">').parent()
 
   assign_events: ->
     $('.control_div') .on 'click', @clear
@@ -102,6 +102,7 @@ class PersistentGrass
       return if not ($ ($ this) .children()[0]).attr('id')
       elem= ($ ($ this).children()[0])
 
+    return if not ($ this).id != getCurrentElement().id
     if elem .css 'height' != elem.data 'height'
       elem .trigger 'changed', ['height', this.style.height]
       elem .data 'height', elem .css 'height'
@@ -128,7 +129,7 @@ class PersistentGrass
     if ev.x > this.dataset['offset']
       this.style.left=ev.x - this.dataset['offset']  + "px"
     this.style.top=ev.y + "px"
-    this.style.position = "absolute"
+
     stopPropagation(ev)
 
   dragend: (ev) ->
