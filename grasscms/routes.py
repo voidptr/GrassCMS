@@ -1,11 +1,57 @@
 from grasscms.models import Blog, Page, Html
-from grasscms.openid_login import *
 from grasscms.converters import *
 from grasscms.objects import *
 from werkzeug import secure_filename
 import json, os
+from flask.ext.login import (LoginManager, current_user, login_required,
+                             login_user, logout_user, UserMixin, AnonymousUser,
+                             confirm_login, fresh_login_required)
+
+
 app.jinja_env.filters['html'] = render_html
 object_base = Objects()
+login_manager = LoginManager()
+login_manager.setup_app(app)
+
+class DbUser(object):
+    """Wraps User object for Flask-Login"""
+    def __init__(self, user):
+        self._user = user
+
+    def get_id(self):
+        return unicode(self._user.id)
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def is_authenticated(self):
+        return True
+
+@login_manager.user_loader
+def load_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        return DbUser(user)
+    else:
+        return None
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    next = request.args.get('next')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if user.password == password:
+            if login_user(DbUser(user)):
+                flash("You have logged in")
+                return redirect(next or url_for('index', error=error))
+        error = "Login failed"
+    return render_template('login.html', login=True, next=next, error=error)
 
 def save_file(file_):
     file_secure_name = secure_filename(file_.filename)

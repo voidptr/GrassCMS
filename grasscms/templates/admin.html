@@ -1,64 +1,56 @@
 <html class="acontrol_div">
 	<head>
 		<title>GrassCMS</title>
-		<script src="static/libs/zepto.min.js"></script>
-		<script src="static/js/grasscms.js"> </script>
+		<script src="{{static('libs/zepto.min.js')}}"></script>
+		<script src="{{static('js/grasscms.js')}}"> </script>
 		<script> setTimeout(function(){ $('.alert_hide').hide(); }, 15000)</script>
-		<link href="css/grasscms.css" rel="stylesheet" />
+		<link href="{{static('css/grasscms.css')}}" rel="stylesheet" />
 	</head>
 	<body>
-
-<div style="display:none;" class="modal hide" id="page_form">
-  <div class="modal-header">
-    <h3>Add new page</h3>
-<form class="form-horizontal">
-  <fieldset>
-    <legend>Adding a new page</legend>
-
-    <div class="control-group">
-      <label class="control-label" for="input01">Parent page</label>
-      <div class="controls">
-        <select class="input-xlarge" id="input02">
-			<option value=""> -- None --</option>
-			<option value="APageName">APageName</option>
-			<option value="APageName">APageName</option>
-		</select>
-      </div>
-    </div>
-
-
-    <div class="control-group">
-      <label class="control-label" for="input01">Page name</label>
-      <div class="controls">
-        <input type="text" class="input-xlarge" id="input01" placeholder="Your cute page name goes here."/>
-        <p class="help-block">Choose something you'll remember easily</p>
-      </div>
-    </div>
-
-  </fieldset>
-</form>
-  </div>
-  <div class="modal-body">
-
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn" onclick="$('#page_form').hide();">Close</a>
-    <a href="#" class="btn btn-primary">Save changes</a>
-  </div>
-</div>
-
-		<div class="span4" style="position:absolute; z-index:1000; top:10px; right:20px;">
-			<div class="alert alert-info alert_hide">
-				<p> Tip: Double click on a textbox to edit the text on it
-					<a style="position:relative; top:-20px; text-decoration:none; right:-21px; line-height:18px; float:right; font-size:20px; color:black; opacity:0.2" onclick="$(this).parent().parent().remove();" href="#">&times;</a></p>
+		<div style="display:none;" class="modal hide" id="page_form">
+			<div class="modal-header">
+				<h3>Add new page</h3>
 			</div>
-			<div class="alert alert-info alert_hide">
-				<p> Tip: Upload your own css files, they'll be automatically added!<br/> (Note that each element has an id!)
-					<a style="position:relative; top:-20px; text-decoration:none; right:-21px; line-height:18px; float:right; font-size:20px; color:black; opacity:0.2" onclick="$(this).parent().parent().remove();" href="#">&times;</a></p>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<fieldset>
+						<legend>Adding a new page</legend>
+						<div class="control-group">
+							<label class="control-label" for="input01">Parent page</label>
+							<div class="controls">
+								<select class="input-xlarge" id="input02">
+									<option value=""> -- None --</option>
+									<option value="APageName">APageName</option>
+									<option value="APageName">APageName</option>
+								</select>
+							  </div>
+						 </div>
+						<div class="control-group">
+							<label class="control-label" for="input01">Page name</label>
+							<div class="controls">
+								<input type="text" class="input-xlarge" id="input01" placeholder="Your cute page name goes here."/>
+								<p class="help-block">Choose something you'll remember easily</p>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" onclick="$('#page_form').hide();">Close</a>
+				<a href="#" class="btn btn-primary">Save changes</a>
 			</div>
 		</div>
+	</div>
+	<div class="span4" style="position:absolute; z-index:1000; top:10px; right:20px;">
+		<div class="alert alert-info alert_hide">
+			<p> Tip: Double click on a textbox to edit the text on it
+				<a style="position:relative; top:-20px; text-decoration:none; right:-21px; line-height:18px; float:right; font-size:20px; color:black; opacity:0.2" onclick="$(this).parent().parent().remove();" href="#">&times;</a></p>
 		</div>
-
+		<div class="alert alert-info alert_hide">
+			<p> Tip: Upload your own css files, they'll be automatically added!<br/> (Note that each element has an id!)
+				<a style="position:relative; top:-20px; text-decoration:none; right:-21px; line-height:18px; float:right; font-size:20px; color:black; opacity:0.2" onclick="$(this).parent().parent().remove();" href="#">&times;</a></p>
+		</div>
+	</div>
 		<!-- Here is located the menu and panel, this should not be touched -->
 		<ul id="menu">
 			<li> <a href="#" onclick="setCss('z-index', '1000', getFromMenu(this), true)"> Send to front </a></li>
@@ -180,9 +172,7 @@
 		</div>
 		<!-- End of static code -->
 	<div class="control_div">
-		<img id="a1" src="img/airoscript-ng.png" style="width:200px; height:200px" class="persistentGrassy">
-		<img id="a2" src="img/airoscript-ng.png" class="persistentGrassy">
-		<img id="a5" src="img/airoscript-ng.png" class="persistentGrassy">
+		<img id="a1" src="{{static('img/add.png')}}" style="width:200px; height:200px" class="persistentGrassy">
 		<div id="a7" style="width:120px; height:120px" contentEditable=true class="persistentGrassy textGrassy" draggable=true >Text </div>
 		<hr class="rect-x">
 		<hr class="rect-y">
