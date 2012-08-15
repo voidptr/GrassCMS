@@ -69,15 +69,16 @@ class Blog(Base):
 class Page(Base):
     __tablename__ = "pages"
     id = Column(Integer, primary_key=True)
-    id_ = Column(Integer) # Ok... not the nicest approach, but the easiest to implement ;-)
-    name = Column(String(60))
+    parent = Column(Integer, ForeignKey('blogs.id'))
+    title = Column(String(60))
     blog = Column(Integer, ForeignKey('blogs.id'))
     width = Column (Integer)
     height = Column (Integer)
 
-    def __init__(self, blog, name):
-        self.name = name
+    def _ _init__(self, blog, title):
         self.blog = blog
+        self.parent = None
+        self.title = title
         __table_args__ = {
             'mysql_engine': 'InnoDB',
             'mysql_charset': 'utf8'
@@ -86,18 +87,17 @@ class Page(Base):
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(String(60))
+    realname = Column(String(60))
     email = Column(String(200))
-    openid = Column(String(200))
     blog = Column(Integer, ForeignKey('blogs.id'))
-    index = Column(Integer, ForeignKey('pages.id'))
+    main_page = Column(Integer, ForeignKey('pages.id'))
 
-    def __init__(self, name, email, openid, blog, index):
-        self.name = name
+    def  __init__(self, name, email, blog, index):
+        self.realname = name
         self.email = email
         self.openid = openid
         self.blog = blog
-        self.index = index
+        self.main_page = index
         __table_args__ = {
             'mysql_engine': 'InnoDB',
             'mysql_charset': 'utf8'

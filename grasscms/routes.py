@@ -1,4 +1,4 @@
-from grasscms.models import Blog, Page, Html
+from grasscms.models import User, Blog, Page, Html
 from grasscms.converters import *
 from grasscms.objects import *
 from werkzeug import secure_filename
@@ -38,6 +38,10 @@ def load_user(user_id):
     else:
         return None
 
+@app.before_request
+def set_globals():
+    g.user = None
+    g.user_is_admin = False
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -46,7 +50,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-        if user.password == password:
+        if user and user.password == password:
             if login_user(DbUser(user)):
                 flash("You have logged in")
                 return redirect(next or url_for('index', error=error))
