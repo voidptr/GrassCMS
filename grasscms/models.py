@@ -69,16 +69,19 @@ class Blog(Base):
 class Page(Base):
     __tablename__ = "pages"
     id = Column(Integer, primary_key=True)
-    parent = Column(Integer, ForeignKey('blogs.id'))
+    parent = Column(Integer, ForeignKey('pages.id'))
     title = Column(String(60))
     blog = Column(Integer, ForeignKey('blogs.id'))
     width = Column (Integer)
     height = Column (Integer)
 
-    def _ _init__(self, blog, title):
+    def __init__(self, blog, title, name=False):
         self.blog = blog
         self.parent = None
         self.title = title
+        if not name:
+            name = title
+        self.name = name
         __table_args__ = {
             'mysql_engine': 'InnoDB',
             'mysql_charset': 'utf8'
@@ -89,13 +92,14 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     realname = Column(String(60))
     email = Column(String(200))
+    password = Column(String(200))
     blog = Column(Integer, ForeignKey('blogs.id'))
     main_page = Column(Integer, ForeignKey('pages.id'))
 
-    def  __init__(self, name, email, blog, index):
+    def  __init__(self, name, email, password, blog, index):
         self.realname = name
         self.email = email
-        self.openid = openid
+        self.password = password
         self.blog = blog
         self.main_page = index
         __table_args__ = {

@@ -3,7 +3,6 @@
 """
     GrassCMS - Simple drag and drop content management system
 """
-
 from grasscms.odt2html import Odt2html, quick_xsl
 import os
 import mimetypes

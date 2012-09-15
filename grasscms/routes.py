@@ -42,20 +42,45 @@ def load_user(user_id):
 def set_globals():
     g.user = None
     g.user_is_admin = False
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
-    next = request.args.get('next')
     if request.method == 'POST':
-        username = request.form['username']
+        next_ = request.args.get('next', False)
+        email = request.form['email']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(email=email).first()
         if user and user.password == password:
             if login_user(DbUser(user)):
-                flash("You have logged in")
-                return redirect(next or url_for('index', error=error))
+                blog = Blog.query.filter_by(id = user.blog).first()
+                return redirect('http://' + blog.subdomain + "." + app.config['SERVER_NAME'])
         error = "Login failed"
     return render_template('login.html', login=True, next=next, error=error)
+
+@app.route('/register', methods=['GET'])
+def register():
+    return render_template('register.html')
+
+@app.route('/register', methods=['POST'])
+def do_register():
+    blog = Blog(request.form['page'], request.form['subdomain'],
+        request.form['description'])
+    db_session.add(blog)
+    db_session.commit()
+    page = Page(blog.id, request.form['page'])
+    db_session.add(page)
+    db_session.commit()
+
+    user = User(request.form['name'],
+                request.form['email'],
+                request.form['password'],
+                blog.id,
+                page.id)
+    db_session.add(user)
+    db_session.commit()
+    return redirect("http://" + request.form['subdomain'] + "." +\
+        app.config['SERVER_NAME'])
 
 def save_file(file_):
     file_secure_name = secure_filename(file_.filename)
@@ -104,17 +129,6 @@ def svgedit(subdomain=False):
     user_page, user_blog = check_user()
     return render_template('svg-editor.html', page=request.args.get('page'))
 
-@app.route('/page-admin/<page>', subdomain="<subdomain>")
-def pageadmin(page=False, subdomain=False):
-    user_page, user_blog = check_user()
-    if g.user:
-        main_url = "http://" + user_blog.subdomain + "." +\
-         app.config['SERVER_NAME']
-    else:
-        main_url = "http://grasscms.com"
-    return render_template('pages.html', main_url=main_url, page=user_page,
-        blog=user_blog)
-
 @app.route('/')
 def landing():
     user_blog, user_page = check_user()
@@ -135,10 +149,9 @@ def page(blog_name=False, page_="index", subpage=0, main_url=False):
     user_blog, user_page = check_user()
     try:
         blog = Blog.query.filter_by(subdomain=blog_name).first()
-        page = Page.query.filter_by(blog=blog.id, name=page_, id_=subpage).first()
-        app.logger.info(page)
+        page = Page.query.filter_by(blog=blog.id, title=page_).first()
         if not page:
-            page = Page.query.filter_by(name=page_, blog=blog.id).first()
+            page = Page.query.filter_by(blog=blog.id).first()
     except AttributeError, error:
         app.logger.info(error)
 
@@ -152,13 +165,15 @@ def page(blog_name=False, page_="index", subpage=0, main_url=False):
         main_url = "http://" + user_blog.subdomain + "." + \
         app.config['SERVER_NAME']
 
+    app.logger.info(user_blog)
+    app.logger.info(blog)
+    app.logger.info(g.user)
     if blog == user_blog and g.user:
         g.user_is_admin = True
 
     static_htmls = Html.query.filter_by(blog=blog.id, page=page.id)
 
-    # In a future, each page must have a full title.
-    title = page.name
+    title = page.title
     paid_user = blog.paid_this_month
 
     if title == "index":
