@@ -16,7 +16,6 @@ docx_mimetypes = [
 
 odt_converter = Odt2html(quick_xsl)
 
-
 def get_type(path):
     """
         Get the mimetype of the file, returns an array.

@@ -2,16 +2,15 @@ from grasscms.models import User, Blog, Page, Html
 from grasscms.converters import *
 from grasscms.objects import *
 from werkzeug import secure_filename
-import json, os
-from flask.ext.login import (LoginManager, current_user, login_required,
-                             login_user, logout_user, UserMixin, AnonymousUser,
-                             confirm_login, fresh_login_required)
-
+import json
+import os
+from flask.ext.login import (LoginManager, login_user)
 
 app.jinja_env.filters['html'] = render_html
 object_base = Objects()
 login_manager = LoginManager()
 login_manager.setup_app(app)
+
 
 class DbUser(object):
     """Wraps User object for Flask-Login"""
@@ -30,18 +29,23 @@ class DbUser(object):
     def is_authenticated(self):
         return True
 
+
 @login_manager.user_loader
 def load_user(user_id):
     user = User.query.get(user_id)
     if user:
+        g.user = user
         return DbUser(user)
     else:
         return None
 
+
 @app.before_request
 def set_globals():
-    g.user = None
     g.user_is_admin = False
+    if not hasattr(g, 'user'):
+        g.user = False
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -53,19 +57,21 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and user.password == password:
             if login_user(DbUser(user)):
-                blog = Blog.query.filter_by(id = user.blog).first()
+                blog = Blog.query.filter_by(id=user.blog).first()
                 return redirect('http://' + blog.subdomain + "." + app.config['SERVER_NAME'])
         error = "Login failed"
-    return render_template('login.html', login=True, next=next, error=error)
+    return render_template('login.html', login=True, next_=next_, error=error)
+
 
 @app.route('/register', methods=['GET'])
 def register():
     return render_template('register.html')
 
+
 @app.route('/register', methods=['POST'])
 def do_register():
     blog = Blog(request.form['page'], request.form['subdomain'],
-        request.form['description'])
+                request.form['description'])
     db_session.add(blog)
     db_session.commit()
     page = Page(blog.id, request.form['page'])
@@ -79,8 +85,9 @@ def do_register():
                 page.id)
     db_session.add(user)
     db_session.commit()
-    return redirect("http://" + request.form['subdomain'] + "." +\
-        app.config['SERVER_NAME'])
+    return redirect("http://" + request.form['subdomain'] + "." +
+                    app.config['SERVER_NAME'])
+
 
 def save_file(file_):
     file_secure_name = secure_filename(file_.filename)
@@ -88,23 +95,28 @@ def save_file(file_):
     file_.save(path)
     return (file_secure_name, path)
 
+
 def get_element_by_id(id_):
     return Html.query.filter_by(id_=id_, user=g.user.id).first()
+
 
 def get_page_by_id(name, id_=0):
     return Page.query.filter_by(name=name, id_=id_).first()
 
+
 def get_path(filename):
-    return os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], str(g.user.id) ), filename)
+    return os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], str(g.user.id)), filename)
+
 
 def check_user():
     if g.user:
         user_blog = Blog.query.filter_by(id=g.user.blog).first()
-        user_page = Page.query.filter_by(id=g.user.index).first() if g.user else ""
+        user_page = Page.query.filter_by(blog=g.user.blog).first() if g.user else ""
     else:
         user_page = False
         user_blog = False
     return (user_blog, user_page)
+
 
 @app.route("/upload/<page>", methods=("GET", "POST"), subdomain="<subdomain>")
 def upload_(page, subdomain=False):
@@ -116,7 +128,7 @@ def upload_(page, subdomain=False):
             app.logger.info(content)
             result = getattr(object_base, field_name)(page, content)
         except Exception, error:
-            flash('Error file, unsupported format, reason: %s' %(error))
+            flash('Error file, unsupported format, reason: %s' % error)
             app.logger.info(error)
             return ""
         if not result:
@@ -124,20 +136,23 @@ def upload_(page, subdomain=False):
         return result
     return render_template("upload.html", filedata="", page=page, blog=blog)
 
+
 @app.route('/image/edit', subdomain="<subdomain>")
 def svgedit(subdomain=False):
     user_page, user_blog = check_user()
     return render_template('svg-editor.html', page=request.args.get('page'))
+
 
 @app.route('/')
 def landing():
     user_blog, user_page = check_user()
     if g.user:
         main_url = "http://" + user_blog.subdomain + "." +\
-        app.config['SERVER_NAME']
+            app.config['SERVER_NAME']
     else:
         main_url = 'http://landing.' + app.config['SERVER_NAME']
     return redirect(main_url)
+
 
 @app.route('/<page_>', subdomain='<blog_name>')
 @app.route('/<page_>/<subpage>', subdomain='<blog_name>')
@@ -157,13 +172,13 @@ def page(blog_name=False, page_="index", subpage=0, main_url=False):
 
     if not blog:
         return render_template('start_your_blog.html',
-            url = app.config['SERVER_NAME'])
+                               url=app.config['SERVER_NAME'])
     elif not page:
         abort(404)
 
     if g.user:
         main_url = "http://" + user_blog.subdomain + "." + \
-        app.config['SERVER_NAME']
+            app.config['SERVER_NAME']
 
     app.logger.info(user_blog)
     app.logger.info(blog)
@@ -181,13 +196,16 @@ def page(blog_name=False, page_="index", subpage=0, main_url=False):
     paid_user = blog.paid_this_month
 
     if not g.user_is_admin:
-        return render_template( 'index.html', main_url=main_url, page=page,
-            blog=user_blog, static_htmls=static_htmls,
-            description=blog.description, title=title, paid_user = paid_user)
+        return render_template('index.html', main_url=main_url, page=page,
+                               blog=user_blog, static_htmls=static_htmls,
+                               description=blog.description, title=title,
+                               paid_user=paid_user)
     else:
-        return render_template( 'admin.html', main_url=main_url, page=page,
-            blog=user_blog, static_htmls=static_htmls, title=title,
-            first_run=request.args.get('first_run'))
+        return render_template('admin.html', main_url=main_url, page=page,
+                               blog=user_blog, static_htmls=static_htmls,
+                               title=title,
+                               first_run=request.args.get('first_run'))
+
 
 @app.route('/object/<type_>/', methods=['PUT', 'DELETE', 'GET', 'POST'], subdomain="<subdomain>")
 def object_manager(type_, subdomain=False):
@@ -213,6 +231,7 @@ def object_manager(type_, subdomain=False):
         try:
             page = request.form['page']
         except KeyError, err:
+            app.logger.info(err)
             page = "index"
         return getattr(object_base, type_)(page, result)
 
@@ -227,22 +246,22 @@ def object_manager(type_, subdomain=False):
                 abort(404)
             return "true"
 
-        object_ = Html.query.filter_by(id_=id_).first();
+        object_ = Html.query.filter_by(id_=id_).first()
         db_session.delete(object_)
         db_session.commit()
         return json.dumps("True")
 
     elif method == "GET":
         try:
-            attr=request.form['attr']
+            attr = request.form['attr']
             return json.dumps(getattr(element, attr))
         except KeyError:
-            return json.dumps(element) # TODO: Nope.
+            return json.dumps(element)   # TODO: Nope.
 
     elif method == "PUT":
         try:
-            attr=request.form['attr']
-            data=request.form['result']
+            attr = request.form['attr']
+            data = request.form['result']
         except KeyError:
             return json.dumps("False")
 
@@ -254,12 +273,13 @@ def object_manager(type_, subdomain=False):
             app.logger.info(error)
             return "False"
 
+
 @app.route('/set/<what>/<id_>/<result>', methods=['GET', 'POST'], subdomain="<subdomain>")
 def set(what, id_, result, subdomain=False):
     element = get_element_by_id(id_)
     if result == "in_post":
-        result="<div class='handler'></div>\
-           <textarea class='alsoResizable'>%s</textarea>" %(request.form['result'])
+        result = "<div class='handler'></div>\
+           <textarea class='alsoResizable'>%s</textarea>" % request.form['result']
     try:
         setattr(element, what, result)
         db_session.commit()
