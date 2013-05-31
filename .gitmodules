@@ -1,0 +1,3 @@
+[submodule "grasscms/static/src/vendor/editor"]
+	path = grasscms/static/src/vendor/editor
+	url = https://github.com/TheOtherNet/simpleHtml5Editor

@@ -1,4 +1,12 @@
 # Functions that might be used outside the plugin
+stoppropagation = (evt) ->
+  evt.stopPropagation()
+  evt.preventDefault()
+
+recover_mobility = () ->
+  element = getCurrentElement()
+  ($ element) .attr 'draggable', true
+  ($ element) .removeClass 'editor_active'
 
 setCss = (param, value, element, parent)  ->
   element = $('#' + element) # We're getting element as an id
@@ -27,8 +35,16 @@ delete_ = (element, parent=False) ->
 getCurrentElement = () ->
   return $('#' + $('#panel_left')[0].dataset['current_element'])
 
+stoppropagation = (ev) ->
+    ev.preventDefault()
+    ev.stopPropagation()
+
 # Exports
+window.stopPropagation = stoppropagation
 window.getCurrentElement = getCurrentElement
 window.delete_ = delete_
 window.setCss=setCss
+window.recover_mobility = recover_mobility
 window.getFromMenu = getFromMenu
+window.drop = drop
+

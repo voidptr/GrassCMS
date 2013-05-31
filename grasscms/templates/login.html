@@ -1,34 +1,64 @@
-{%extends 'layout.html' %}
+<body>
+	<head>
+		<title>{% block title %}Log-in{% endblock %}</title>
+		<link href="{{static('css/grasscms.css')}}" rel="stylesheet" />
+    <style type="text/css">
+      /* Override some defaults */
+      html, body {
+        background-color: #eee;
+      }
+      body {
+        padding-top: 40px;
+      }
+      .container {
+        width: 300px;
+      }
 
-{%block head%}
-	<link type="text/css" rel="stylesheet" href="{{ static('css/openid.css') }}" />
-	<script type="text/javascript" src="{{ static('js/libs/openid/openid-jquery.js') }}"></script>
-	<script type="text/javascript" src="{{ static('js/libs/openid/openid-en.js') }}"></script> 
-    <script> $(document).ready(function() { openid.init('openid_identifier'); }); </script>
-{%endblock%}
+      /* The white background content wrapper */
+      .container > .content {
+        background-color: #fff;
+        padding: 20px;
+        margin: 0 -20px;
+        -webkit-border-radius: 10px 10px 10px 10px;
+           -moz-border-radius: 10px 10px 10px 10px;
+                border-radius: 10px 10px 10px 10px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+           -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+                box-shadow: 0 1px 2px rgba(0,0,0,.15);
+      }
 
-{%block body%}
-    <form action="/login" method="post" id='openid_form'> 
-        <input type=hidden name=next value="{{ next }}" />
-		<input type="hidden" name="action" value="verify" />
-		<fieldset>
-			<legend>Sign-in or Create New Account</legend>
-			<div id="openid_choice">
-				<p>Please click your account provider:</p>
-				<div id="openid_btns"></div>
-			</div>
-			<div id="openid_input_area">
-				<input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
-				<input id="openid_submit" type="submit" value="Sign-In" />
+    .login-form {
+      margin-left: 65px;
+    }
 
-			</div>
-    		<input type="submit" value="Sign-In" />
+    legend {
+      margin-right: -50px;
+      font-weight: bold;
+      color: #404040;
+    }
 
-			<noscript>
-				<p>OpenID is service that allows you to log-on to many different websites using a single indentity.
-				Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
-			</noscript>
-		</fieldset>
-	</form>
+    </style>
 
-{%endblock%}
+</head>
+<body>
+  <div class="container">
+      <div class="content">
+          <div class="row">
+              <div class="login-form">
+                  <h2>Login</h2>
+                  <form action="/login" method=post>
+                      <fieldset>
+                          <div class="clearfix">
+                              <input type="text" name="email" placeholder="E-mail">
+                          </div>
+                          <div class="clearfix">
+                              <input type="password" name="password" placeholder="Password">
+                          </div>
+                          <button class="btn primary" type="submit">Sign in</button>
+                      </fieldset>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div> <!-- /container -->
+

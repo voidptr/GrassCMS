@@ -1,0 +1,71 @@
+<body>
+	<head>
+		<title>{% block title %}Create Profile{% endblock %}</title>
+		<link href="{{static('css/grasscms.css')}}" rel="stylesheet" />
+	</head>
+	<div class="container-fluid well span12" style="float:none; margin-left:auto; margin-right:auto;">
+		<div class="span12" style="margin-left:auto; margin-right:auto; float:none">
+    <form action=/register class="form-horizontal" method="post">
+		<div class="span5">
+			<fieldset> 
+			<legend style="text-align:center"> Tell us about you </legend>
+				<div class="control-group">
+					<label class="control-label" for="name">Name</label>
+					<div class="controls">
+						<input type="text" id="name" name="name" required />
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="email">Email address</label>
+					<div class="controls"> 
+						<div class="input-append">
+							<input class="span2" class="input-xlarge" name="email" id="email" type="text" required />
+							<span class="add-on"><i class="icon-envelope"></i></span>
+						</div>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="password">Password</label>
+					<div class="controls"> 
+						<input type="password" id="password" name="password" required />
+					</div>
+				</div>
+			</fieldset>
+		</div>
+			<div class=span5>
+			<fieldset style="float:right">
+				<legend style="text-align:center">
+					Configure your GrassCMS site
+				</legend>
+        <div class="control-group">
+            <label class="control-label" for="subdomain">Subdomain</label>
+            <div class="controls">
+                <input type="text" id="subdomain" name="subdomain" required />
+                <p class="help-block"> GrassCMS provides free subdomains under grasscms.com, choose yours </p> 
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="page">Page Title</label>
+            <div class="controls">
+                <input type="text" id="page" name="page" required />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="description">Description</label>
+            <div class="controls">
+                <textarea id="description" name="description" placeholder="Insert a short description of your site" required></textarea>
+            </div>
+        </div>
+
+		</fieldset>	
+		<div  class="form-actions">
+            <input type=submit class="btn btn-success btn-large" value="Create profile" />
+            <input type=submit onclick="document.location.href='/'; return false" class="btn btn-danger btn-large" value="Cancel" />
+        </div>
+
+
+    </form>
+</div>
+</div>
+
+</body>

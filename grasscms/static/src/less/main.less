@@ -1,9 +1,28 @@
-
-@import 'less/menu.less';
 @import 'less/variables.less';
+@import 'less/editor.less';
+@import 'less/menu.less';
 @import 'less/modifiable.less';
+@import 'less/bootstrap/bootstrap.less';
 
+.control_div{
+	position:absolute; left:250px;
+	margin:0px;
+	top:0px;
+	min-height:80%;
+	min-width:80%;
+	padding:0px;
+}
 
-body{
-	position:absolute; left:@panel_width;
+select.editor_nav{ 
+	margin-top:9px;
+}
+
+.simpleHtml5Editor{ 
+	padding: 0px!important;  
+}
+
+.editor_group{ margin-top:9px; }
+
+.editor_button{ 
+	color:black; 
 }

@@ -1,5 +1,12 @@
-{% extends "layout.html" %}
-{% block title%} {{title}}{%endblock%}
+<html>
+	<head>
+		<title>{% block title%} {{title}}{%endblock%}</title>
+		<script src="{{static('libs/zepto.min.js')}}"></script>
+		<script src="{{static('js/grasscms.js')}}"> </script>
+		<script> setTimeout(function(){ $('.alert_hide').hide(); }, 15000)</script>
+		<link href="{{static('css/grasscms.css')}}" rel="stylesheet" />
+	</head>
+
 
 {% block body_start %}
 	<meta name="paid_user" value="{{paid_user}}" />
@@ -9,7 +16,6 @@
 <body style="padding-top:40px; position:relative;" >
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
-            <div class="container" style="width: auto;">
                 <a class="brand" href="#">GrassCMS</a>
                 <ul class="nav" style="margin-top:2px">
 					<li> Free page by grasscms </li>
@@ -43,6 +49,7 @@
 
 {%endblock%}
 
+            <div class="container" style="width: auto;">
 {%block head%}
     <meta name="description" content="{{description}}" />
     <script>

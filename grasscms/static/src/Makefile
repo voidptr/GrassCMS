@@ -1,16 +1,18 @@
 # Makefile for grasscms persistence plugin
 
-all: build compress
+all: build_ compress
 
-compress:
-	yui-compressor --type js ./grasscms.js > grasscms.min.js
-	yui-compressor --type css grasscms.css > grasscms.min.css
+compress: build
+	yui-compressor --type js build/js/grasscms.js > build/js/grasscms.min.js
+	yui-compressor --type css build/css/grasscms.css > build/css/grasscms.min.css
 
-build:
-	coffee --join ./grasscms.js --compile coffee/*.coffee
-	lessc less/main.less grasscms.css
+build_:
+	mkdir -p build/js build/css &>/dev/null
+	coffee --join build/js/grasscms.js --compile coffee/*/*.coffee coffee/*.coffee
+	lessc less/main.less build/css/grasscms.css
+	cp -r vendor/editor/less/font-awesome/font/ build/
 
 clean:
-	rm grasscms.js grasscms.min.js grasscms.css grasscms.min.css
+	rm -rf build/js/grasscms* build/css/grasscms*
 
 .PONY: clean build compress all
