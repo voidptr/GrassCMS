@@ -1,0 +1,85 @@
+#menu {
+  list-style: none;
+  line-height: 23px;
+  position: absolute;
+  display: none;
+  padding: 4px;
+  min-width: 120px;
+  background: #e2efef;
+  z-index: 90000;
+}
+#menu li {
+  line-height: 1.5em;
+  padding: 5px 5px 5px 25px;
+  font-size: 11px;
+  border-bottom: 1px solid #fff;
+}
+#current_element_name {
+  text-align: center;
+}
+#panel_left {
+  width: 250px;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  background: #9fccca;
+  border-right: 3px solid #ffffff;
+  z-index: 30;
+}
+.panel_section {
+  border-bottom: 1px solid #c0dedc;
+}
+.rect-y {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 4px;
+  width: 100%;
+  border: 0px;
+  border-bottom: 1px dashed #5ca9a5;
+  padding: 0px;
+  margin: 0px;
+}
+.rect-x {
+  position: fixed;
+  top: 4px;
+  left: 253px;
+  width: 4px;
+  height: 100%;
+  border: 0px;
+  border-left: 1px dashed #5ca9a5;
+  padding: 0px;
+  margin: 0px;
+}
+.panel_section > h4 {
+  display: inline;
+}
+img.persistentGrassy {
+  width: 100%;
+  height: 100%;
+}
+div.persistentGrassy {
+  width: 100%;
+  height: 100%;
+}
+.resizable {
+  width: 100px;
+  height: 100px;
+  resize: both;
+  overflow: auto;
+}
+.selectedObject {
+  border: 1px dotted grey;
+}
+.persistentGrassy {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+body {
+  position: absolute;
+  left: 250px;
+}
