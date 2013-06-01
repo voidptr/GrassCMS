@@ -1,4 +1,5 @@
 */*/*/uploads/*
+GrassCMS.egg-info/
 */.DS_Store
 .*.sw?
 *.pyc
